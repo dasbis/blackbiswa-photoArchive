@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHIVE — A Photographic Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0e0e10; --ink-2:#151517; --bone:#f1ede4; --bone-dim:#c9c4b8;
+    --brass:#b08d57; --brass-soft:#8a744f; --ash:#6b6864; --blood:#8c2f2f;
+    --hair: rgba(241,237,228,0.14); --radius: 2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--ink); color:var(--bone); font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; user-select:none;}
+  ::selection{background:var(--brass); color:var(--ink);}
+  a{color:inherit;} img{max-width:100%; display:block;}
+
+  .eyebrow{font-family:'Space Mono',monospace; font-size:11px; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--brass);}
+
+  header.nav{position:fixed; top:0; left:0; right:0; z-index:60;
+    display:flex; align-items:center; justify-content:space-between; padding:22px 5vw;
+    background:linear-gradient(to bottom, rgba(14,14,16,0.92), rgba(14,14,16,0));
+    backdrop-filter:blur(2px);}
+  .brand{font-family:'Fraunces',serif; font-weight:600; font-size:20px; letter-spacing:0.02em;}
+  .brand span{color:var(--brass);}
+  nav.links{display:flex; gap:34px; align-items:center;}
+  nav.links a{font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    text-decoration:none; color:var(--bone-dim); font-family:'Space Mono',monospace;
+    transition:color .25s ease;}
+  nav.links a:hover{color:var(--bone);}
+
+  .hero{min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    padding:0 5vw; position:relative; border-bottom:1px solid var(--hair);}
+  .hero-grid{display:grid; grid-template-columns: 1.4fr 1fr; gap:60px; align-items:end;}
+  .hero h1{font-family:'Fraunces',serif; font-weight:300; font-size:clamp(48px, 8.6vw, 128px);
+    line-height:0.94; margin:18px 0 0; letter-spacing:-0.01em;}
+  .hero h1 em{font-style:italic; font-weight:400; color:var(--brass);}
+  .hero p{font-size:15px; line-height:1.7; color:var(--bone-dim); max-width:38ch;
+    margin:0 0 8px; font-weight:300;}
+  .hero .meta-col{display:flex; flex-direction:column; gap:18px; padding-bottom:10px;}
+  .meta-row{display:flex; justify-content:space-between; border-top:1px solid var(--hair);
+    padding-top:10px; font-family:'Space Mono',monospace; font-size:11px; color:var(--ash);
+    letter-spacing:.05em;}
+  .meta-row b{color:var(--bone-dim); font-weight:400;}
+  .scroll-cue{position:absolute; bottom:36px; left:5vw; font-family:'Space Mono',monospace;
+    font-size:10px; letter-spacing:.2em; color:var(--ash); text-transform:uppercase;
+    display:flex; align-items:center; gap:10px;}
+  .scroll-cue::after{content:''; width:24px; height:1px; background:var(--brass);
+    animation:pulseline 2.2s ease-in-out infinite;}
+  @keyframes pulseline{ 0%,100%{width:24px;opacity:.5} 50%{width:44px;opacity:1} }
+
+  .gallery-section{ padding:120px 5vw 140px; position:relative; }
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:60px; border-bottom:1px solid var(--hair); padding-bottom:24px;
+    flex-wrap:wrap; gap:20px;}
+  .section-head h2{font-family:'Fraunces',serif; font-weight:300; font-size:clamp(28px,3.6vw,46px); margin:6px 0 0;}
+  .count-tag{font-family:'Space Mono',monospace; font-size:12px; color:var(--ash);}
+
+  .wall{display:grid; grid-template-columns:repeat(12, 1fr); grid-auto-rows:7.2vw; gap:18px;}
+  .frame{position:relative; background:var(--ink-2); border:1px solid var(--hair);
+    overflow:hidden; cursor:pointer; opacity:0; transform:translateY(28px);
+    transition:opacity .7s ease, transform .7s ease, border-color .3s ease;}
+  .frame.in{opacity:1; transform:translateY(0);}
+  .frame:hover{border-color:var(--brass-soft);}
+  .frame:hover .frame-img{transform:scale(1.045);}
+  .frame:hover .frame-tag{opacity:1; transform:translateY(0);}
+
+  .frame-img-wrap{position:absolute; inset:0; overflow:hidden;}
+  .frame-img{width:100%; height:100%; object-fit:cover; pointer-events:none;
+    -webkit-user-drag:none; user-drag:none; transition:transform .9s cubic-bezier(.16,.8,.24,1);
+    filter:grayscale(0.06) contrast(1.03);}
+  .shield{position:absolute; inset:0; z-index:5; background:transparent;}
+
+  .frame-tag{position:absolute; left:12px; bottom:12px; z-index:6;
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.08em;
+    color:var(--bone); background:rgba(14,14,16,0.72); padding:6px 10px;
+    opacity:0; transform:translateY(6px); transition:opacity .3s ease, transform .3s ease;
+    display:flex; gap:10px;}
+  .frame-tag .idx{color:var(--brass);}
+
+  .wm{position:absolute; inset:-20%; z-index:4; display:grid; grid-template-columns:repeat(4,1fr);
+    transform:rotate(-28deg); opacity:0.10; pointer-events:none;}
+  .wm span{font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.1em;
+    color:var(--bone); white-space:nowrap; padding:22px 0; text-align:center;}
+
+  .frame.g0{grid-column:1 / 8;  grid-row:span 2;}
+  .frame.g1{grid-column:8 / 13; grid-row:span 3;}
+  .frame.g2{grid-column:1 / 5;  grid-row:span 2;}
+  .frame.g3{grid-column:5 / 9;  grid-row:span 2;}
+  .frame.g4{grid-column:9 / 13; grid-row:span 2;}
+  .frame.g5{grid-column:1 / 13; grid-row:span 2;}
+
+  @media (max-width: 860px){
+    .hero-grid{grid-template-columns:1fr; gap:30px;}
+    .wall{grid-template-columns:repeat(2,1fr); grid-auto-rows:44vw;}
+    .frame.g0,.frame.g1,.frame.g2,.frame.g3,.frame.g4,.frame.g5{grid-column: span 2; grid-row:span 1;}
+    nav.links{display:none;}
+  }
+
+  .empty{grid-column:1/-1; border:1px dashed var(--hair); padding:70px 20px; text-align:center;}
+  .empty p{color:var(--ash); font-size:14px; margin:10px 0 0;}
+  .empty .eyebrow{display:block; margin-bottom:6px;}
+
+  footer{padding:60px 5vw 40px; border-top:1px solid var(--hair); display:flex;
+    justify-content:space-between; flex-wrap:wrap; gap:20px;
+    font-family:'Space Mono',monospace; font-size:11px; color:var(--ash);}
+  footer .note{max-width:52ch; line-height:1.7;}
+
+  .lightbox{position:fixed; inset:0; z-index:100; background:rgba(10,10,11,0.97);
+    display:none; align-items:center; justify-content:center; padding:6vw;}
+  .lightbox.open{display:flex;}
+  .lb-inner{position:relative; max-width:1100px; width:100%;}
+  .lb-img-wrap{position:relative; max-height:80vh; display:flex; justify-content:center;}
+  .lb-img-wrap img{max-height:80vh; object-fit:contain; pointer-events:none; -webkit-user-drag:none;}
+  .lb-meta{display:flex; justify-content:space-between; margin-top:16px;
+    font-family:'Space Mono',monospace; font-size:11px; color:var(--ash); letter-spacing:.05em;}
+  .lb-close{position:absolute; top:-46px; right:0; background:none; border:none;
+    color:var(--bone-dim); font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    cursor:pointer; font-family:'Space Mono',monospace;}
+  .lb-close:hover{color:var(--brass);}
+
+  ::-webkit-scrollbar{width:9px;}
+  ::-webkit-scrollbar-track{background:var(--ink);}
+  ::-webkit-scrollbar-thumb{background:var(--ink-2); border:1px solid var(--hair);}
+</style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="brand">ARCHIVE<span>.</span></div>
+    <nav class="links">
+      <a href="#wall">Wall</a>
+      <a href="#about">Notes</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow">A photographic journal</span>
+        <h1>Every frame,<br><em>kept</em> in order.</h1>
+      </div>
+      <div class="meta-col">
+        <p>A wall for the pictures I've taken — arranged the way a contact
+        sheet gets pinned to a darkroom wall, not the way a feed scrolls
+        past you.</p>
+        <div class="meta-row"><span>Format</span><b>Living archive</b></div>
+        <div class="meta-row"><span>Access</span><b>View only</b></div>
+      </div>
+    </div>
+    <div class="scroll-cue">Scroll to the wall</div>
+  </section>
+
+  <section class="gallery-section" id="wall">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">The Wall</span>
+        <h2>Contact sheet</h2>
+      </div>
+      <div class="count-tag" id="countTag">No. 000 frames</div>
+    </div>
+    <div class="wall" id="wallGrid"></div>
+  </section>
+
+  <section id="about" style="padding:0 5vw 100px;">
+    <div style="max-width:620px;">
+      <span class="eyebrow">Notes on this archive</span>
+      <p style="font-size:14px; line-height:1.8; color:var(--bone-dim); font-weight:300; margin-top:14px;">
+      Right-click and drag are switched off on every photograph, and a
+      faint tiled mark sits over each image. None of this makes a picture
+      un-copyable — a determined viewer can always screenshot a screen —
+      it simply removes the one-click ways of lifting a file.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="brand" style="font-size:15px;">ARCHIVE<span>.</span></div>
+    <div class="note">A view-only gallery. Photos are added by editing the
+    PHOTOS list in this page's source and are the same for every visitor.</div>
+  </footer>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lb-inner">
+      <button class="lb-close" id="lbClose">Close ✕</button>
+      <div class="lb-img-wrap"><img id="lbImg" src="" alt=""></div>
+      <div class="lb-meta"><span id="lbTitle"></span><span id="lbDate"></span></div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // ADD YOUR PHOTOS HERE.
+  // 1) Upload image files into a "photos" folder in your repo
+  //    (same folder as this index.html — create it when uploading).
+  // 2) Add one line below per photo: file name, title, date.
+  // 3) Commit — every visitor sees the same wall immediately.
+  // ============================================================
+  const PHOTOS = [
+    // { file: "photos/example-01.jpg", title: "Morning fog, Ridge Road", date: "2026-03-14" },
+    // { file: "photos/example-02.jpg", title: "Still life, kitchen table", date: "2026-04-02" },
+  ];
+
+  const wallGrid = document.getElementById('wallGrid');
+  const countTag = document.getElementById('countTag');
+  const lightbox = document.getElementById('lightbox');
+  const lbImg    = document.getElementById('lbImg');
+  const lbTitle  = document.getElementById('lbTitle');
+  const lbDate   = document.getElementById('lbDate');
+  const lbClose  = document.getElementById('lbClose');
+
+  const GEOM = ['g0','g1','g2','g3','g4','g5'];
+  const WM_WORDS = ['ARCHIVE','© UNPUBLISHED','DO NOT COPY'];
+
+  document.addEventListener('contextmenu', e=>{
+    if(e.target.closest('.frame') || e.target.closest('.lightbox')) e.preventDefault();
+  });
+  document.addEventListener('dragstart', e=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
+
+  function buildWatermark(){
+    const wm = document.createElement('div');
+    wm.className = 'wm';
+    for(let i=0;i<24;i++){
+      const s = document.createElement('span');
+      s.textContent = WM_WORDS[i % WM_WORDS.length];
+      wm.appendChild(s);
+    }
+    return wm;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderEmpty(){
+    wallGrid.innerHTML = `
+      <div class="empty">
+        <span class="eyebrow">Frame 000</span>
+        <p>No photos added yet. Open this page's source and add entries<br>
+        to the PHOTOS list to fill the wall.</p>
+      </div>`;
+  }
+
+  function renderWall(){
+    if(PHOTOS.length === 0){ renderEmpty(); countTag.textContent = 'No. 000 frames'; return; }
+    countTag.textContent = 'No. ' + String(PHOTOS.length).padStart(3,'0') + ' frames';
+    const frag = document.createDocumentFragment();
+
+    PHOTOS.forEach((photo, i)=>{
+      const idx = i + 1;
+      const frame = document.createElement('div');
+      frame.className = 'frame ' + GEOM[i % GEOM.length];
+
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'frame-img-wrap';
+      const img = document.createElement('img');
+      img.className = 'frame-img';
+      img.src = photo.file;
+      img.loading = 'lazy';
+      img.draggable = false;
+      img.alt = photo.title || ('Frame ' + idx);
+      imgWrap.appendChild(img);
+      imgWrap.appendChild(buildWatermark());
+
+      const shield = document.createElement('div');
+      shield.className = 'shield';
+
+      const tag = document.createElement('div');
+      tag.className = 'frame-tag';
+      tag.innerHTML = `<span class="idx">No. ${String(idx).padStart(2,'0')}</span><span>${escapeHtml(photo.title || 'Untitled')}</span>`;
+
+      frame.appendChild(imgWrap);
+      frame.appendChild(shield);
+      frame.appendChild(tag);
+      frame.addEventListener('click', ()=> openLightbox(photo, idx));
+
+      frag.appendChild(frame);
+    });
+
+    wallGrid.innerHTML = '';
+    wallGrid.appendChild(frag);
+    observeReveal();
+  }
+
+  function observeReveal(){
+    const frames = document.querySelectorAll('.frame:not(.in)');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, {threshold:0.12});
+    frames.forEach(f=>io.observe(f));
+  }
+
+  function openLightbox(photo, idx){
+    lbImg.src = photo.file;
+    lbImg.draggable = false;
+    lbTitle.textContent = 'No. ' + String(idx).padStart(2,'0') + ' — ' + (photo.title || 'Untitled');
+    lbDate.textContent = photo.date || '';
+    lightbox.classList.add('open');
+  }
+  lbClose.addEventListener('click', ()=> lightbox.classList.remove('open'));
+  lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) lightbox.classList.remove('open'); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') lightbox.classList.remove('open'); });
+
+  renderWall();
+})();
+</script>
+</body>
+</html>
